@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PingTok // SYSTEM</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/wavesurfer.js@7"></script>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --tech-blue: #0055FF; 
+            --paper-white: #F3F4F6;
+            --pure-black: #000000;
+            --grid-color: rgba(0, 85, 255, 0.08); 
+        }
+
+        /* Waveform Container */
+        .waveform-box {
+            background: #FAFAFA;
+            border: 1px solid #E5E7EB;
+            padding: 10px;
+            margin-bottom: 20px;
+            position: relative;
+        }
+        
+        .play-btn {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            width: 40px;
+            height: 40px;
+            background: var(--pure-black);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 10;
+            transition: transform 0.2s;
+        }
+        .play-btn:hover { transform: translate(-50%, -50%) scale(1.1); }
+        
+        body {
+            background-color: var(--paper-white);
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--pure-black);
+            background-image: 
+                linear-gradient(var(--grid-color) 1px, transparent 1px),
+                linear-gradient(90deg, var(--grid-color) 1px, transparent 1px);
+            background-size: 40px 40px;
+            overflow-x: hidden;
+            animation: gridMove 5s linear infinite;
+        }
+
+        /* Tech Corners Decorator */
+        .corner-bracket {
+            position: absolute;
+            width: 15px;
+            height: 15px;
+            border: 2px solid var(--pure-black);
+        }
+        .cb-tl { top: -2px; left: -2px; border-right: 0; border-bottom: 0; }
+        .cb-tr { top: -2px; right: -2px; border-left: 0; border-bottom: 0; }
+        .cb-bl { bottom: -2px; left: -2px; border-right: 0; border-top: 0; }
+        .cb-br { bottom: -2px; right: -2px; border-left: 0; border-top: 0; }
+
+        @keyframes gridMove {
+            0% { background-position: 0 0; }
+            100% { background-position: 40px 40px; }
+        }
+
+        /* Technical Borders */
+        .border-tech {
+            position: relative;
+            border: 1px solid #000;
+            background: #FFFFFF;
+            transition: all 0.2s ease;
+        }
+        
+        .border-tech:hover {
+            border-color: var(--pure-black);
+            box-shadow: 4px 4px 0px rgba(0,0,0,0.1);
+            transform: translate(-1px, -1px);
+        }
+
+        /* Buttons */
+        .btn-tech {
+            background: #FFFFFF;
+            border: 1px solid #000000;
+            color: #000000;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        
+        .btn-tech:hover {
+            background: var(--pure-black);
+            color: #FFFFFF;
+        }
+        
+        .btn-tech:active {
+            transform: translate(1px, 1px);
+        }
+
+        /* Inputs */
+        .input-tech {
+            background: #FFFFFF;
+            border: 1px solid #E5E7EB;
+            border-left: 3px solid #000000;
+            transition: all 0.2s;
+            color: #000000;
+        }
+        
+        .input-tech:focus {
+            outline: none;
+            border-color: #000000;
+            background: #FAFAFA;
+        }
+        .input-tech::placeholder {
+            color: #9CA3AF;
+        }
+
+        /* Loading Bar */
+        .loader-bar {
+            height: 3px;
+            width: 0%;
+            background: var(--tech-blue);
+            transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .metric-value {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #000000;
+        }
+        .metric-label {
+            font-size: 0.65rem;
+            color: #6B7280;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            font-weight: 500;
+        }
+
+        /* Glitch/Tech Accents - Reimagined for Light Mode as "Status Indicators" */
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background: #000;
+            display: inline-block;
+            margin-right: 8px;
+        }
+        .status-dot.active {
+            background: #10B981; /* Green */
+            box-shadow: 0 0 8px rgba(16, 185, 129, 0.4);
+        }
+        .status-dot.error {
+            background: #EF4444; /* Red */
+        }
+        .status-dot.processing {
+            background: var(--tech-blue);
+            animation: pulse 1s infinite;
+        }
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.4; }
+            100% { opacity: 1; }
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col items-center pt-32 p-4 relative">
+    
+    <!-- HUD Top Left -->
+    <div class="absolute top-6 left-6 text-xs text-gray-500 hidden md:block font-bold">
+        <p>SYSTEM_STATUS: <span class="text-green-600">OPERATIONAL</span></p>
+        <p>NODE: API-ALL-MEDIA</p>
+        <p>VER: 2.1.0-LIGHT</p>
+    </div>
+
+    <!-- HUD Top Right -->
+    <div class="absolute top-6 right-6 flex gap-4 z-50">
+        <button onclick="toggleLanguage()" id="langBtn" class="text-xs text-black font-bold border border-black px-3 py-1 bg-white hover:bg-black hover:text-white transition-colors cursor-pointer shadow-lg">
+            [ LANG: EN ]
+        </button>
+        <button onclick="toggleAbout()" class="text-xs text-black font-bold border border-black px-3 py-1 bg-white hover:bg-black hover:text-white transition-colors cursor-pointer shadow-lg">
+            [ SYSTEM_INFO ]
+        </button>
+        <div class="text-xs text-black font-bold border border-black px-3 py-1 bg-white hidden md:block">
+            LIVE_FEED_ACTIVE
+        </div>
+    </div>
+
+    <!-- ABOUT MODAL (SYSTEM INFO) -->
+    <div id="aboutModal" class="fixed inset-0 z-[9999] hidden">
+        <!-- Backdrop -->
+        <div class="absolute inset-0 bg-white/90 backdrop-blur-sm transition-opacity" onclick="toggleAbout()"></div>
+        
+        <!-- Modal Content -->
+        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[90%] max-w-2xl">
+            <div class="bg-white border-tech p-6 md:p-8 relative shadow-2xl animate-in fade-in zoom-in duration-200">
+                <!-- Corners -->
+                <div class="corner-bracket cb-tl"></div>
+                <div class="corner-bracket cb-tr"></div>
+                <div class="corner-bracket cb-bl"></div>
+                <div class="corner-bracket cb-br"></div>
+
+                <!-- Header -->
+                <div class="flex justify-between items-start mb-8 border-b-2 border-black pb-4">
+                    <div>
+                        <h2 class="text-3xl font-bold tracking-tighter">PINGTOK<span class="text-blue-600">_CORE</span></h2>
+                        <p class="text-xs font-mono text-gray-500 mt-1" data-i18n="doc_level">CLASSIFIED DOCUMENT // LEVEL 4 ACCESS</p>
+                    </div>
+                    <button onclick="toggleAbout()" class="text-xl font-bold hover:text-red-500">×</button>
+                </div>
+
+                <!-- Content Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 font-mono text-xs">
+                    
+                    <!-- Col 1 -->
+                    <div class="space-y-6">
+                        <div>
+                            <h3 class="font-bold bg-black text-white inline-block px-2 py-1 mb-2" data-i18n="sys_arch">SYSTEM ARCHITECTURE</h3>
+                            <ul class="space-y-1 text-gray-600">
+                                <li>> NODE.JS RUNTIME ENV</li>
+                                <li>> EXPRESS.JS NEURAL NET</li>
+                                <li>> IRON_DOME SECURITY LAYER</li>
+                                <li>> TURBO_CACHE MEMORY MODULE</li>
+                            </ul>
+                        </div>
+
+                        <div>
+                            <h3 class="font-bold bg-black text-white inline-block px-2 py-1 mb-2" data-i18n="capabilities">CAPABILITIES</h3>
+                            <p class="text-gray-600 leading-relaxed" data-i18n="cap_desc">
+                                PingTok is a high-velocity media extraction unit designed to bypass restrictive algorithms. Equipped with audio frequency analysis and military-grade encryption tunnels.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Col 2 -->
+                    <div class="space-y-6">
+                        <div>
+                            <h3 class="font-bold bg-black text-white inline-block px-2 py-1 mb-2" data-i18n="op_metrics">OPERATIONAL METRICS</h3>
+                            <div class="border border-gray-200 p-2 space-y-2">
+                                <div class="flex justify-between">
+                                    <span data-i18n="speed">SPEED:</span>
+                                    <span class="font-bold text-blue-600">0.05ms (CACHED)</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span data-i18n="uptime">UPTIME:</span>
+                                    <span class="font-bold text-green-600">99.9%</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span data-i18n="security">SECURITY:</span>
+                                    <span class="font-bold text-red-600">MAXIMUM</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <h3 class="font-bold bg-black text-white inline-block px-2 py-1 mb-2" data-i18n="architect">ARCHITECT</h3>
+                            <p class="text-gray-600">
+                                DEVELOPED BY <span class="font-bold text-black">DAVID</span><br>
+                                "SPEED IS THE ONLY TRUTH."
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Footer -->
+                <div class="mt-8 pt-4 border-t border-gray-100 text-[10px] text-center text-gray-400">
+                    ID: 884-X-PINGTOK // COPYRIGHT 2025 // ALL RIGHTS RESERVED
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <main class="w-full max-w-4xl z-10">
+        
+        <!-- Header -->
+        <header class="mb-12 md:mb-16 text-left border-b-2 border-black pb-8">
+            <h1 class="text-5xl md:text-7xl font-bold tracking-tighter mb-2 text-black">
+                PINGTOK<span class="text-blue-600">.</span>
+            </h1>
+            <div class="flex items-center gap-4 text-xs tracking-widest text-gray-500 font-bold uppercase">
+                <span data-i18n="subtitle">High-Velocity Media Retrieval Unit</span>
+            </div>
+        </header>
+
+        <!-- Input Module -->
+        <div class="bg-white border-tech p-1 mb-2 relative">
+            <!-- Corners -->
+            <div class="corner-bracket cb-tl"></div>
+            <div class="corner-bracket cb-tr"></div>
+            <div class="corner-bracket cb-bl"></div>
+            <div class="corner-bracket cb-br"></div>
+            
+            <div class="flex flex-col md:flex-row gap-0">
+                <div class="relative flex-grow">
+                    <span class="absolute left-4 top-1/2 -translate-y-1/2 text-black font-bold">></span>
+                    <input type="text" id="urlInput" 
+                        class="input-tech w-full py-5 pl-10 pr-4 text-lg font-mono placeholder-gray-400 border-none"
+                        placeholder="INPUT_SOURCE_URL" autocomplete="off">
+                </div>
+                <button onclick="processUrl()" id="execBtn" data-i18n="execute"
+                    class="btn-tech px-10 py-5 md:w-auto w-full text-sm tracking-widest uppercase font-bold border-l border-black">
+                    Execute
+                </button>
+            </div>
+        </div>
+        <!-- Progress Line -->
+        <div id="loaderLine" class="loader-bar w-0 mb-1"></div>
+        
+        <!-- Status Output -->
+        <div id="statusMsg" class="h-6 text-xs text-gray-500 font-mono flex items-center mb-2">
+            <span id="statusDot" class="status-dot"></span>
+            <span id="statusText" data-i18n="status_ready">READY_FOR_INPUT</span>
+        </div>
+
+        <!-- Terminal Logs -->
+        <div id="terminalLogs" class="hidden font-mono text-[10px] text-gray-400 mb-8 p-4 bg-gray-50 border border-gray-200 h-32 overflow-y-auto font-bold">
+            <!-- Logs injected here -->
+        </div>
+
+        <!-- Data Display Module (Results) -->
+        <div id="resultPanel" class="hidden bg-white border-tech p-6 md:p-8 relative">
+            <!-- Corners -->
+            <div class="corner-bracket cb-tl"></div>
+            <div class="corner-bracket cb-tr"></div>
+            <div class="corner-bracket cb-bl"></div>
+            <div class="corner-bracket cb-br"></div>
+
+            <div class="flex flex-col md:flex-row gap-8">
+                
+                <!-- Visual Data -->
+                <div class="w-full md:w-1/3 shrink-0">
+                    <div class="relative aspect-[9/16] bg-gray-100 border border-gray-200 overflow-hidden">
+                        <img id="coverImg" src="" class="w-full h-full object-cover">
+                        <div class="absolute bottom-0 left-0 bg-black text-white text-[10px] px-2 py-1 font-bold">
+                            SRC_PREVIEW
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Meta Data -->
+                <div class="flex-grow flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center gap-4 mb-6 border-b border-gray-100 pb-6">
+                            <img id="authorAvatar" src="" class="w-12 h-12 rounded-full border-2 border-gray-200">
+                            <div>
+                                <h3 id="authorName" class="text-black font-bold text-xl leading-none"></h3>
+                                <p id="authorId" class="text-xs text-gray-500 font-mono mt-1 font-bold bg-gray-100 inline-block px-1">@HANDLE</p>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-8">
+                             <h4 class="text-[10px] uppercase text-gray-400 font-bold mb-2">DESCRIPTION</h4>
+                             <p id="videoTitle" class="text-gray-800 text-sm font-mono leading-relaxed line-clamp-3 bg-gray-50 p-3 border-l-2 border-blue-500">
+                            </p>
+                        </div>
+
+                        <!-- AUDIO VISUALIZER MODULE -->
+                        <div id="audioModule" class="hidden mb-6">
+                            <h4 class="text-[10px] uppercase text-gray-400 font-bold mb-2">AUDIO_FREQUENCY_ANALYSIS</h4>
+                            <div class="waveform-box">
+                                <div id="waveform"></div>
+                                <button id="playPauseBtn" class="play-btn" onclick="toggleAudio()">
+                                    ▶
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Stats Grid -->
+                        <div class="grid grid-cols-4 gap-4 mb-8">
+                            <div class="bg-gray-50 p-3 border border-gray-100 text-center">
+                                <div class="metric-value" id="statPlays">0</div>
+                                <div class="metric-label">PLAYS</div>
+                            </div>
+                            <div class="bg-gray-50 p-3 border border-gray-100 text-center">
+                                <div class="metric-value" id="statLikes">0</div>
+                                <div class="metric-label">LIKES</div>
+                            </div>
+                            <div class="bg-gray-50 p-3 border border-gray-100 text-center">
+                                <div class="metric-value" id="statComments">0</div>
+                                <div class="metric-label">COMMS</div>
+                            </div>
+                            <div class="bg-gray-50 p-3 border border-gray-100 text-center">
+                                <div class="metric-value" id="statShares">0</div>
+                                <div class="metric-label">SHARE</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Actions -->
+                    <div class="space-y-3" id="downloadContainer">
+                        <!-- Buttons injected via JS -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <footer class="mt-12 md:fixed md:bottom-6 md:right-6 text-right text-[10px] text-gray-400 font-mono tracking-widest uppercase">
+        PINGTOK CORP &copy; 2025<br>
+        SECURE DATA PIPELINE
+    </footer>
+
+    <script>
+        let wavesurfer;
+        let currentLang = 'en';
+
+        const translations = {
+            en: {
+                subtitle: "High-Velocity Media Retrieval Unit",
+                execute: "EXECUTE",
+                status_ready: "READY_FOR_INPUT",
+                doc_level: "CLASSIFIED DOCUMENT // LEVEL 4 ACCESS",
+                sys_arch: "SYSTEM ARCHITECTURE",
+                capabilities: "CAPABILITIES",
+                cap_desc: "PingTok is a high-velocity media extraction unit designed to bypass restrictive algorithms. Equipped with audio frequency analysis and military-grade encryption tunnels.",
+                op_metrics: "OPERATIONAL METRICS",
+                speed: "SPEED:",
+                uptime: "UPTIME:",
+                security: "SECURITY:",
+                architect: "ARCHITECT",
+                placeholder: "INPUT_SOURCE_URL",
+                no_input: "NO_INPUT_DETECTED",
+                init_seq: "INITIALIZING_SEQUENCE...",
+                success: "DATA_RETRIEVAL_SUCCESS",
+                error: "SYSTEM_HALTED"
+            },
+            id: {
+                subtitle: "Unit Ekstraksi Media Kecepatan Tinggi",
+                execute: "EKSEKUSI",
+                status_ready: "SIAP_MENERIMA_INPUT",
+                doc_level: "DOKUMEN RAHASIA // AKSES LEVEL 4",
+                sys_arch: "ARSITEKTUR SISTEM",
+                capabilities: "KAPABILITAS",
+                cap_desc: "PingTok adalah unit ekstraksi media berkecepatan tinggi yang dirancang untuk menembus algoritma restriktif. Dilengkapi dengan analisis frekuensi audio dan terowongan enkripsi tingkat militer.",
+                op_metrics: "METRIK OPERASIONAL",
+                speed: "KECEPATAN:",
+                uptime: "WAKTU AKTIF:",
+                security: "KEAMANAN:",
+                architect: "ARSITEK",
+                placeholder: "MASUKKAN_URL_SUMBER",
+                no_input: "TIDAK_ADA_INPUT_TERDETEKSI",
+                init_seq: "MEMULAI_URUTAN_SISTEM...",
+                success: "PENGAMBILAN_DATA_BERHASIL",
+                error: "SISTEM_TERHENTI"
+            }
+        };
+
+        function toggleLanguage() {
+            currentLang = currentLang === 'en' ? 'id' : 'en';
+            const btn = document.getElementById('langBtn');
+            btn.textContent = `[ LANG: ${currentLang.toUpperCase()} ]`;
+            
+            // Update Text Elements
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (translations[currentLang][key]) {
+                    el.textContent = translations[currentLang][key];
+                }
+            });
+
+            // Update Placeholder
+            const input = document.getElementById('urlInput');
+            input.placeholder = translations[currentLang].placeholder;
+
+            // Update Status if idle
+            const statusText = document.getElementById('statusText');
+            if (statusText.textContent === translations['en'].status_ready || statusText.textContent === translations['id'].status_ready) {
+                statusText.textContent = translations[currentLang].status_ready;
+            }
+        }
+
+        function toggleAbout() {
+            const modal = document.getElementById('aboutModal');
+            modal.classList.toggle('hidden');
+        }
+
+        async function processUrl() {
+            const input = document.getElementById('urlInput');
+            const url = input.value.trim();
+            const loaderLine = document.getElementById('loaderLine');
+            const resultPanel = document.getElementById('resultPanel');
+            const termLogs = document.getElementById('terminalLogs');
+            
+            if (!url) {
+                setStatus(translations[currentLang].no_input, 'error');
+                return;
+            }
+
+            // Reset UI
+            if (wavesurfer) {
+                wavesurfer.destroy();
+                wavesurfer = null;
+            }
+            document.getElementById('audioModule').classList.add('hidden');
+            resultPanel.classList.add('hidden');
+            termLogs.innerHTML = '';
+            termLogs.classList.remove('hidden');
+            loaderLine.style.width = '0%';
+            setStatus(translations[currentLang].init_seq, 'processing');
+            
+            // Start Log Sequence
+            const logInterval = runLogSequence();
+
+            try {
+                // Fetch Data
+                loaderLine.style.width = '30%';
+                
+                const apiUrl = `/api/tiktok/download?url=${encodeURIComponent(url)}`;
+                const response = await fetch(apiUrl);
+                const data = await response.json();
+
+                clearInterval(logInterval); // Stop fake logs
+                addLog("> PAYLOAD_RECEIVED [100%]");
+                loaderLine.style.width = '100%';
+
+                if (!data.status || data.status !== 'success') {
+                    throw new Error(data.message || 'Target inaccessible');
+                }
+
+                if (data.cached) {
+                    addLog("> TURBO_CACHE: HIT (MEMORY SERVED)");
+                } else {
+                    addLog("> TURBO_CACHE: MISS (FETCHED NEW)");
+                }
+                
+                addLog("> RENDERING_UI_MODULES...");
+
+                // Render Data
+                setTimeout(() => {
+                    renderResult(data);
+                    setStatus(translations[currentLang].success, 'active');
+                    resultPanel.classList.remove('hidden');
+                    loaderLine.style.width = '0%';
+                    
+                    // Auto scroll logs to bottom
+                    termLogs.scrollTop = termLogs.scrollHeight;
+                }, 500);
+
+            } catch (err) {
+                clearInterval(logInterval);
+                addLog(`> FATAL_ERROR: ${err.message}`);
+                loaderLine.style.width = '100%';
+                loaderLine.style.backgroundColor = '#EF4444'; // Red
+                setStatus(`${translations[currentLang].error}`, 'error');
+                
+                setTimeout(() => {
+                     loaderLine.style.backgroundColor = 'var(--tech-blue)';
+                }, 2000);
+            }
+        }
+
+        function runLogSequence() {
+            const msgs = [
+                "> INITIALIZING_QUANTUM_UPLINK...",
+                "> TARGET_LOCKED [NODE_ALPHA_04]",
+                "> BYPASSING_LAYER_7_FIREWALL...",
+                "> DECRYPTING_SECURE_TOKEN_V4...",
+                "> HANDSHAKE_ESTABLISHED [TLS 1.3]",
+                "> EXTRACTING_MEDIA_FRAGMENTS...",
+                "> REASSEMBLING_DATA_PACKETS...",
+                "> OPTIMIZING_BUFFER_STREAM [100%]"
+            ];
+            let i = 0;
+            
+            addLog("> SYSTEM_STARTUP_INITIATED");
+            
+            return setInterval(() => {
+                if (i < msgs.length) {
+                    addLog(msgs[i]);
+                    i++;
+                    
+                    // Update progress bar slightly with each log
+                    const loader = document.getElementById('loaderLine');
+                    const currentW = parseInt(loader.style.width || 0);
+                    if (currentW < 90) loader.style.width = (currentW + 10) + '%';
+                }
+            }, 600); // Slightly faster logs
+        }
+
+        function addLog(text) {
+            const termLogs = document.getElementById('terminalLogs');
+            const p = document.createElement('div');
+            p.textContent = text;
+            p.className = "mb-1 border-l-2 border-gray-300 pl-2";
+            termLogs.appendChild(p);
+            termLogs.scrollTop = termLogs.scrollHeight;
+        }
+
+        function renderResult(data) {
+            document.getElementById('coverImg').src = data.cover;
+            document.getElementById('authorAvatar').src = data.author.avatar;
+            document.getElementById('authorName').textContent = data.author.name;
+            document.getElementById('authorId').textContent = '@' + data.author.id;
+            document.getElementById('videoTitle').textContent = data.title;
+            
+            // Format Numbers
+            document.getElementById('statPlays').textContent = formatMetric(data.stats.plays);
+            document.getElementById('statLikes').textContent = formatMetric(data.stats.likes);
+            document.getElementById('statComments').textContent = formatMetric(data.stats.comments);
+            document.getElementById('statShares').textContent = formatMetric(data.stats.shares);
+
+            // INITIALIZE AUDIO WAVEFORM
+            const audioData = data.downloads.find(d => d.type === 'audio');
+            if (audioData) {
+                const audioModule = document.getElementById('audioModule');
+                audioModule.classList.remove('hidden');
+                
+                wavesurfer = WaveSurfer.create({
+                    container: '#waveform',
+                    waveColor: '#D1D5DB', // Light Gray
+                    progressColor: '#0055FF', // Tech Blue
+                    cursorColor: '#000000',
+                    barWidth: 2,
+                    barGap: 3,
+                    barRadius: 2,
+                    height: 60,
+                    responsive: true,
+                    hideScrollbar: true,
+                    url: `/api/proxy/stream?url=${encodeURIComponent(audioData.url)}&type=audio`
+                });
+
+                wavesurfer.on('finish', () => {
+                    document.getElementById('playPauseBtn').textContent = '▶';
+                });
+            }
+
+            // Buttons
+            const btnContainer = document.getElementById('downloadContainer');
+            btnContainer.innerHTML = ''; 
+
+            data.downloads.forEach(dl => {
+                const btn = document.createElement('button');
+                const isNoWm = dl.label.includes('No Watermark');
+                
+                // Styling
+                btn.className = `w-full py-4 text-xs font-bold tracking-widest uppercase transition-all duration-200 flex items-center justify-between px-6 border border-black ${
+                    isNoWm 
+                    ? 'bg-black text-white hover:bg-gray-800' 
+                    : 'bg-white text-black hover:bg-gray-100'
+                }`;
+
+                // Content
+                btn.innerHTML = `
+                    <span>${dl.label}</span>
+                    <span class="font-normal opacity-70">↓ DOWNLOAD</span>
+                `;
+
+                // Action: Proxy Download
+                btn.onclick = () => initiateDownload(dl.url, dl.type, isNoWm);
+                
+                btnContainer.appendChild(btn);
+            });
+        }
+
+        function toggleAudio() {
+            if (wavesurfer) {
+                wavesurfer.playPause();
+                const btn = document.getElementById('playPauseBtn');
+                btn.textContent = wavesurfer.isPlaying() ? '⏸' : '▶';
+            }
+        }
+
+        function initiateDownload(fileUrl, type, isClean) {
+            setStatus('INITIATING_TRANSFER...', 'processing');
+            
+            // Create a temporary link to trigger the download via our proxy
+            const proxyUrl = `/api/proxy/stream?url=${encodeURIComponent(fileUrl)}&type=${type}`;
+            
+            window.location.href = proxyUrl;
+            
+            setTimeout(() => {
+                setStatus('TRANSFER_COMPLETE', 'active');
+            }, 3000);
+        }
+
+        function setStatus(msg, type) {
+            const textEl = document.getElementById('statusText');
+            const dotEl = document.getElementById('statusDot');
+            
+            textEl.textContent = msg;
+            
+            // Reset classes
+            dotEl.className = 'status-dot';
+            dotEl.classList.add(type);
+        }
+
+        function formatMetric(num) {
+            if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M';
+            if (num >= 1000) return (num / 1000).toFixed(1) + 'K';
+            return num;
+        }
+
+        // Keyboard Support
+        document.getElementById('urlInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') processUrl();
+        });
+    </script>
+</body>
+</html>
