@@ -1,6 +1,6 @@
 # PINGTOK CORE
 
-> **HIGH-VELOCITY MEDIA RETRIEVAL UNIT**
+> **UNIFIED HIGH-VELOCITY MEDIA RETRIEVAL UNIT**
 
 ![NodeJS](https://img.shields.io/badge/RUNTIME-NODE.JS-black?style=flat-square&logo=node.js)
 ![Express](https://img.shields.io/badge/NEURAL_NET-EXPRESS-black?style=flat-square&logo=express)
@@ -11,9 +11,9 @@
 
 ## 📡 SYSTEM OVERVIEW
 
-**PingTok** is a specialized, high-performance extraction engine designed to bypass standard media restrictions on TikTok. Unlike conventional downloaders, PingTok utilizes a **Dual-Engine Architecture** and **Turbo Cache Memory** to deliver payloads with near-zero latency.
+**PingTok** is a specialized extraction engine designed to bypass standard media restrictions on TikTok. It utilizes a **Unified Core Architecture**, merging a high-fidelity industrial interface with a robust serverless API. This monolith design ensures maximum stability and near-zero latency delivery across edge networks.
 
-Developed under the **Industrial Light Protocol**, the interface prioritizes speed, clarity, and technical precision.
+Developed under the **Industrial Light Protocol**, the system prioritizes speed, data integrity, and technical precision.
 
 ---
 
@@ -21,34 +21,30 @@ Developed under the **Industrial Light Protocol**, the interface prioritizes spe
 
 ```mermaid
 graph LR
-    User[USER_INPUT] --> IronDome{IRON_DOME_SEC}
-    IronDome -->|Authorized| Cache[TURBO_CACHE_MEM]
+    User[USER_INPUT] --> Monolith{UNIFIED_CORE}
+    Monolith -->|Internal Route| Cache[TURBO_CACHE_MEM]
     Cache -->|Hit 0.05ms| User
-    Cache -->|Miss| Engine1[TIKWM_API_NODE]
-    Engine1 -->|Success| Cache
-    Engine1 -->|Fail| Engine2[METADOWNLOADER]
-    Engine2 -->|Success| Cache
-    Cache -->|Stream| Proxy[SECURE_PROXY]
+    Cache -->|Miss| Engine[TIKWM_API_NODE]
+    Engine -->|Payload| Cache
+    Cache -->|Buffer Stream| Proxy[SECURE_PROXY]
     Proxy --> User
 ```
 
 ---
 
-## ⚡ KEY CAPABILITIES
+## ⚡ KEY_CAPABILITIES
 
-### **1. TURBO CACHE MODULE**
+### **1. UNIFIED CORE DESIGN**
+Seamless integration of frontend and backend within a single deployment unit, optimized for Vercel Serverless Functions.
+
+### **2. TURBO CACHE MODULE**
 Instant retrieval for frequently accessed media. Zero latency response for repeated requests within the cache window (1 Hour).
-
-### **2. IRON DOME SECURITY**
-*   **Rate Limiting:** Automatic IP blocking (100 requests / 15 mins).
-*   **Header Obfuscation:** Server identity masking via Helmet.
-*   **SSRF Protection:** Secure proxy tunneling preventing internal network scans.
 
 ### **3. AUDIO FREQUENCY ANALYSIS**
 Integrated `WaveSurfer` engine provides real-time visual analysis of audio tracks before extraction.
 
 ### **4. POLYGLOT INTERFACE**
-Native support for **English (EN)** and **Bahasa Indonesia (ID)** with instant runtime switching.
+Native support for **English (EN)** and **Bahasa Indonesia (ID)** with instant runtime switching via the HUD.
 
 ---
 
@@ -75,21 +71,16 @@ Native support for **English (EN)** and **Bahasa Indonesia (ID)** with instant r
 
 ### OPTION B: CLOUD DEPLOY (VERCEL)
 
-PingTok is optimized for serverless architecture.
+PingTok is pre-configured for Vercel's Edge infrastructure.
 
-1.  **Install Vercel CLI**
-    ```bash
-    npm i -g vercel
-    ```
-
-2.  **Execute Deploy Command**
+1.  **Execute Deploy Command**
     ```bash
     vercel --prod
     ```
 
 ---
 
-## 🔌 API DOCUMENTATION
+## 🔌 API_SPECIFICATIONS
 
 **ENDPOINT:** `GET /api/tiktok/download`
 
@@ -97,23 +88,16 @@ PingTok is optimized for serverless architecture.
 | :--- | :--- | :--- |
 | `url` | `string` | Target TikTok video URL (Required) |
 
-**RESPONSE PAYLOAD:**
+**PAYLOAD_SCHEMA:**
 ```json
 {
   "status": "success",
   "platform": "tiktok",
   "cached": true,
   "title": "Video Description",
-  "author": {
-    "name": "User",
-    "id": "user_id"
-  },
+  "author": { "name": "User", "id": "id" },
   "downloads": [
-    {
-      "type": "video",
-      "label": "HD No Watermark",
-      "url": "https://..."
-    }
+    { "type": "video", "label": "HD No Watermark", "url": "..." }
   ]
 }
 ```
@@ -125,5 +109,5 @@ PingTok is optimized for serverless architecture.
 **ARCHITECT:** [David](https://github.com/david-aistudio)  
 **AFFILIATION:** PINGTOK CORP  
 
-> SECURE DATA PIPELINE // EST. 2025
+> SECURE DATA PIPELINE // EST. 2025 // VERSION 2.1.4 stable
 
