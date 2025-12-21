@@ -53,10 +53,49 @@ async function fetchTikTokData(videoUrl) {
 }
 
 function formatTikwmResponse(data) {
+  const images = data.images || [];
+  const downloads = [];
+
+  // Handle Video
+  if (data.hdplay || data.play) {
+    downloads.push({
+      type: "video",
+      label: "HD No Watermark",
+      url: data.hdplay || data.play,
+      is_hd: true
+    });
+  }
+  if (data.wmplay) {
+    downloads.push({
+      type: "video",
+      label: "Watermark",
+      url: data.wmplay,
+      is_hd: false
+    });
+  }
+
+  // Handle Music
+  if (data.music) {
+    downloads.push({
+      type: "audio",
+      label: "MP3 Audio",
+      url: data.music,
+      is_hd: false
+    });
+  }
+
+  // Handle Slideshow Images
+  const slideImages = images.map((imgUrl, index) => ({
+    type: "image",
+    label: `Photo ${index + 1}`,
+    url: imgUrl
+  }));
+
   return {
     status: "success",
     platform: "tiktok",
-    title: data.title || "TikTok Video",
+    type: images.length > 0 ? "slideshow" : "video",
+    title: data.title || "TikTok Content",
     cover: data.cover || data.origin_cover,
     author: {
       name: data.author?.nickname || "Unknown",
@@ -69,26 +108,8 @@ function formatTikwmResponse(data) {
       comments: data.comment_count || 0,
       shares: data.share_count || 0
     },
-    downloads: [
-      {
-        type: "video",
-        label: "HD No Watermark",
-        url: data.hdplay || data.play,
-        is_hd: true
-      },
-      {
-        type: "video",
-        label: "Watermark",
-        url: data.wmplay,
-        is_hd: false
-      },
-      {
-        type: "audio",
-        label: "MP3 Audio",
-        url: data.music,
-        is_hd: false
-      }
-    ].filter(item => item.url),
+    downloads: downloads,
+    images: slideImages // Separate list for the UI slider
   };
 }
 

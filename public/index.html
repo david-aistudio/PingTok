@@ -43,6 +43,45 @@
             margin-bottom: 20px;
             position: relative;
         }
+
+        /* Slideshow Styles */
+        .slider-container {
+            display: flex;
+            overflow-x: auto;
+            scroll-snap-type: x mandatory;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none; /* Firefox */
+            gap: 10px;
+            padding-bottom: 10px;
+        }
+        .slider-container::-webkit-scrollbar { display: none; }
+        
+        .slide {
+            flex: 0 0 100%;
+            scroll-snap-align: center;
+            position: relative;
+        }
+        .slide img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain; /* Changed to contain to show full photo */
+            background: #000;
+        }
+        
+        .slider-dots {
+            display: flex;
+            justify-content: center;
+            gap: 5px;
+            margin-top: 10px;
+        }
+        .dot {
+            width: 6px;
+            height: 6px;
+            background: #ccc;
+            border-radius: 50%;
+            transition: background 0.3s;
+        }
+        .dot.active { background: var(--tech-blue); }
         
         .play-btn {
             position: absolute;
@@ -615,7 +654,54 @@
         }
 
         function renderResult(data) {
-            document.getElementById('coverImg').src = data.cover;
+            const visualContainer = document.querySelector('.w-full.md\\:w-1\\/3');
+            
+            // RESET VISUAL CONTAINER
+            visualContainer.innerHTML = '';
+
+            if (data.type === 'slideshow' && data.images && data.images.length > 0) {
+                // RENDER SLIDESHOW
+                const sliderHTML = `
+                    <div class="relative aspect-[9/16] bg-black border border-gray-200 overflow-hidden group">
+                        <div class="slider-container" id="imageSlider">
+                            ${data.images.map((img, idx) => `
+                                <div class="slide">
+                                    <img src="${img.url}" alt="Slide ${idx+1}">
+                                    <div class="absolute bottom-0 left-0 bg-black/80 text-white text-[10px] px-2 py-1 font-bold">
+                                        PHOTO ${idx+1} / ${data.images.length}
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                        <div class="slider-dots" id="sliderDots">
+                            ${data.images.map((_, idx) => `<div class="dot ${idx===0?'active':''}"></div>`).join('')}
+                        </div>
+                    </div>
+                `;
+                visualContainer.innerHTML = sliderHTML;
+
+                // Add scroll listener for dots
+                const slider = document.getElementById('imageSlider');
+                const dots = document.querySelectorAll('.dot');
+                slider.addEventListener('scroll', () => {
+                    const scrollPos = slider.scrollLeft;
+                    const width = slider.offsetWidth;
+                    const activeIndex = Math.round(scrollPos / width);
+                    dots.forEach((d, i) => d.classList.toggle('active', i === activeIndex));
+                });
+
+            } else {
+                // RENDER VIDEO COVER (Standard)
+                visualContainer.innerHTML = `
+                    <div class="relative aspect-[9/16] bg-gray-100 border border-gray-200 overflow-hidden">
+                        <img id="coverImg" src="${data.cover}" class="w-full h-full object-cover">
+                        <div class="absolute bottom-0 left-0 bg-black text-white text-[10px] px-2 py-1 font-bold">
+                            VIDEO_PREVIEW
+                        </div>
+                    </div>
+                `;
+            }
+
             document.getElementById('authorAvatar').src = data.author.avatar;
             document.getElementById('authorName').textContent = data.author.name;
             document.getElementById('authorId').textContent = '@' + data.author.id;
@@ -656,6 +742,21 @@
             const btnContainer = document.getElementById('downloadContainer');
             btnContainer.innerHTML = ''; 
 
+            // If slideshow, show image downloads first
+            if (data.type === 'slideshow' && data.images) {
+                 data.images.forEach(img => {
+                    const btn = document.createElement('button');
+                    btn.className = `w-full py-3 text-xs font-bold tracking-widest uppercase transition-all duration-200 flex items-center justify-between px-6 border border-gray-300 bg-white text-black hover:bg-gray-50 mb-2`;
+                    btn.innerHTML = `
+                        <span>${img.label}</span>
+                        <span class="font-normal opacity-70">↓ JPG</span>
+                    `;
+                    btn.onclick = () => initiateDownload(img.url, 'image');
+                    btnContainer.appendChild(btn);
+                 });
+            }
+
+            // Show standard downloads (Audio/Video)
             data.downloads.forEach(dl => {
                 const btn = document.createElement('button');
                 const isNoWm = dl.label.includes('No Watermark');
