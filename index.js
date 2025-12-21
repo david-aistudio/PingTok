@@ -1,31 +1,11 @@
 const express = require("express");
 const cors = require("cors");
 const path = require("path");
-const helmet = require("helmet");
-const rateLimit = require("express-rate-limit");
 
 const app = express();
 
 // Required for Vercel (Trust the reverse proxy to get correct IPs)
 app.set('trust proxy', 1);
-
-// SECURITY LAYER 1: HTTP Headers Hardening
-// app.use(helmet({
-//   contentSecurityPolicy: false,
-// }));
-
-// SECURITY LAYER 2: Anti-DDoS / Rate Limiting
-// const limiter = rateLimit({
-//   windowMs: 15 * 60 * 1000, 
-//   max: 100, 
-//   standardHeaders: true,
-//   legacyHeaders: false,
-//   message: {
-//     status: "error",
-//     message: "Too many requests from this IP, please try again after 15 minutes. (Anti-Spam Protection)"
-//   }
-// });
-// app.use("/api/", limiter);
 
 // Enable CORS
 app.use(cors());

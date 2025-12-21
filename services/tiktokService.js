@@ -1,5 +1,4 @@
 const axios = require("axios");
-// const metadownloader = require("metadownloader");
 
 // TURBO CACHE STORAGE
 const memoryCache = new Map();
@@ -10,7 +9,6 @@ const CACHE_DURATION = 60 * 60 * 1000; // 1 Hour
  * Strategy:
  * 1. Check Cache (Instant)
  * 2. Primary: TikWM API (Fast, rich metadata)
- * 3. Fallback: DISABLED FOR DEBUGGING
  * 
  * @param {string} videoUrl - TikTok video URL
  * @returns {Promise<Object>}
@@ -51,27 +49,6 @@ async function fetchTikTokData(videoUrl) {
   } catch (error) {
     console.log(`[Primary API Failed] ${error.message}.`);
     throw new Error("Gagal mengambil data video. Server sedang sibuk, coba lagi nanti.");
-    
-    // Attempt 2: metadownloader Fallback (DISABLED)
-    /*
-    try {
-      const data = await metadownloader(videoUrl);
-      if (!data || !data.result) {
-        throw new Error("Fallback downloader failed");
-      }
-      const result = formatMetadownloaderResponse(data);
-      // Save to Cache
-      memoryCache.set(videoUrl, { timestamp: Date.now(), data: result });
-      return result;
-    } catch (fallbackError) {
-      console.error(`[Fallback Failed] ${fallbackError.message}`);
-      // Throw the original error or a generic one if both fail
-      if (error.code === 'ECONNABORTED') {
-        throw new Error("Request timeout. Server TikTok lagi sibuk, coba lagi nanti.");
-      }
-      throw new Error("Gagal mengambil data video. Pastikan link tidak private dan coba lagi.");
-    }
-    */
   }
 }
 
@@ -110,36 +87,6 @@ function formatTikwmResponse(data) {
         label: "MP3 Audio",
         url: data.music,
         is_hd: false
-      }
-    ].filter(item => item.url),
-  };
-}
-
-function formatMetadownloaderResponse(data) {
-  // Normalize metadownloader response to match our schema
-  const result = data.result;
-  return {
-    status: "success",
-    platform: "tiktok",
-    title: result.title || "TikTok Video",
-    cover: result.thumbnail || "https://via.placeholder.com/150",
-    author: {
-      name: "TikTok User", // Library might not provide detailed author info
-      avatar: "https://ui-avatars.com/api/?name=T",
-      id: "unknown"
-    },
-    stats: {
-      plays: 0,
-      likes: 0,
-      comments: 0,
-      shares: 0
-    },
-    downloads: [
-      {
-        type: "video",
-        label: "HD No Watermark",
-        url: result.url, // Usually the main no-watermark url
-        is_hd: true
       }
     ].filter(item => item.url),
   };
