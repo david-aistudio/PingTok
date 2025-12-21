@@ -56,8 +56,8 @@ Native support for **English (EN)** and **Bahasa Indonesia (ID)** with instant r
 
 1.  **Clone Repository**
     ```bash
-    git clone https://github.com/david-aistudio/pingtok-core.git
-    cd pingtok-core
+    git clone https://github.com/david-aistudio/PingTok.git
+    cd PingTok
     ```
 
 2.  **Install Dependencies**
