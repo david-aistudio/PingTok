@@ -1,5 +1,5 @@
 const axios = require("axios");
-const metadownloader = require("metadownloader");
+// const metadownloader = require("metadownloader");
 
 // TURBO CACHE STORAGE
 const memoryCache = new Map();
@@ -10,7 +10,7 @@ const CACHE_DURATION = 60 * 60 * 1000; // 1 Hour
  * Strategy:
  * 1. Check Cache (Instant)
  * 2. Primary: TikWM API (Fast, rich metadata)
- * 3. Fallback: metadownloader library (Reliable backup)
+ * 3. Fallback: DISABLED FOR DEBUGGING
  * 
  * @param {string} videoUrl - TikTok video URL
  * @returns {Promise<Object>}
@@ -49,9 +49,11 @@ async function fetchTikTokData(videoUrl) {
     // If code is not 0, throw to trigger fallback
     throw new Error("TikWM API returned error code");
   } catch (error) {
-    console.log(`[Primary API Failed] ${error.message}. Switching to Fallback...`);
+    console.log(`[Primary API Failed] ${error.message}.`);
+    throw new Error("Gagal mengambil data video. Server sedang sibuk, coba lagi nanti.");
     
-    // Attempt 2: metadownloader Fallback
+    // Attempt 2: metadownloader Fallback (DISABLED)
+    /*
     try {
       const data = await metadownloader(videoUrl);
       if (!data || !data.result) {
@@ -69,6 +71,7 @@ async function fetchTikTokData(videoUrl) {
       }
       throw new Error("Gagal mengambil data video. Pastikan link tidak private dan coba lagi.");
     }
+    */
   }
 }
 

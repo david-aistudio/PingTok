@@ -10,23 +10,22 @@ const app = express();
 app.set('trust proxy', 1);
 
 // SECURITY LAYER 1: HTTP Headers Hardening
-app.use(helmet({
-  contentSecurityPolicy: false, // Disabled for inline scripts (needed for our UI)
-}));
+// app.use(helmet({
+//   contentSecurityPolicy: false,
+// }));
 
 // SECURITY LAYER 2: Anti-DDoS / Rate Limiting
-// Limit each IP to 100 requests per 15 minutes
-const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, 
-  max: 100, 
-  standardHeaders: true,
-  legacyHeaders: false,
-  message: {
-    status: "error",
-    message: "Too many requests from this IP, please try again after 15 minutes. (Anti-Spam Protection)"
-  }
-});
-app.use("/api/", limiter);
+// const limiter = rateLimit({
+//   windowMs: 15 * 60 * 1000, 
+//   max: 100, 
+//   standardHeaders: true,
+//   legacyHeaders: false,
+//   message: {
+//     status: "error",
+//     message: "Too many requests from this IP, please try again after 15 minutes. (Anti-Spam Protection)"
+//   }
+// });
+// app.use("/api/", limiter);
 
 // Enable CORS
 app.use(cors());
