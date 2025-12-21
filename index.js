@@ -30,16 +30,13 @@ app.use(cors());
 app.use(express.json());
 app.set("json spaces", 2);
 
-// Serve Static Frontend
-app.use(express.static(path.join(__dirname, "public")));
-
 // API Routes
 app.use("/api/tiktok", require("./routes/tiktok"));
 app.use("/api/proxy", require("./routes/proxy"));
 
-// Handle SPA (Single Page Application) - Send all other requests to index.html
-app.get("*", (req, res) => {
-  res.sendFile(path.join(__dirname, "public", "index.html"));
+// Root route for API health check
+app.get("/", (req, res) => {
+  res.json({ status: "online", system: "PingTok Core", version: "2.1.0" });
 });
 
 // VERCEL SERVERLESS CONFIGURATION
