@@ -36,6 +36,13 @@ app.set("json spaces", 2);
 app.use("/api/tiktok", require("./routes/tiktok"));
 app.use("/api/proxy", require("./routes/proxy"));
 
+// Serve Frontend (Monolith Mode)
+app.use(express.static(path.join(__dirname, "public")));
+
+app.get("*", (req, res) => {
+  res.sendFile(path.join(__dirname, "public", "index.html"));
+});
+
 // VERCEL SERVERLESS CONFIGURATION
 if (require.main === module) {
   // Local Development
