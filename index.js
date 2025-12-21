@@ -36,11 +36,6 @@ app.set("json spaces", 2);
 app.use("/api/tiktok", require("./routes/tiktok"));
 app.use("/api/proxy", require("./routes/proxy"));
 
-// Root route for API health check
-app.get("/", (req, res) => {
-  res.json({ status: "online", system: "PingTok Core", version: "2.1.0" });
-});
-
 // VERCEL SERVERLESS CONFIGURATION
 if (require.main === module) {
   // Local Development
