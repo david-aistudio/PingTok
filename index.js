@@ -6,6 +6,9 @@ const rateLimit = require("express-rate-limit");
 
 const app = express();
 
+// Required for Vercel (Trust the reverse proxy to get correct IPs)
+app.set('trust proxy', 1);
+
 // SECURITY LAYER 1: HTTP Headers Hardening
 app.use(helmet({
   contentSecurityPolicy: false, // Disabled for inline scripts (needed for our UI)
