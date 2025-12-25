@@ -14,21 +14,24 @@ const CACHE_DURATION = 60 * 60 * 1000; // 1 Hour
  * @returns {Promise<Object>}
  */
 async function fetchTikTokData(videoUrl) {
+  // 0. EXPAND URL (Fix for TikTok Lite / Short Links)
+  const finalUrl = await expandUrl(videoUrl);
+  
   // 1. CACHE CHECK
-  if (memoryCache.has(videoUrl)) {
-    const cached = memoryCache.get(videoUrl);
+  if (memoryCache.has(finalUrl)) {
+    const cached = memoryCache.get(finalUrl);
     if (Date.now() - cached.timestamp < CACHE_DURATION) {
-      console.log(`[CACHE HIT] Serving from memory: ${videoUrl}`);
+      console.log(`[CACHE HIT] Serving from memory: ${finalUrl}`);
       return { ...cached.data, cached: true };
     }
-    memoryCache.delete(videoUrl); // Expired, remove
+    memoryCache.delete(finalUrl); // Expired, remove
   }
 
   // Attempt 1: TikWM
   try {
     const res = await axios.get("https://www.tikwm.com/api/", {
       params: {
-        url: videoUrl,
+        url: finalUrl,
         hd: 1
       },
       headers: {
@@ -41,7 +44,7 @@ async function fetchTikTokData(videoUrl) {
     if (res.data.code === 0 && res.data.data) {
       const result = formatTikwmResponse(res.data.data);
       // Save to Cache
-      memoryCache.set(videoUrl, { timestamp: Date.now(), data: result });
+      memoryCache.set(finalUrl, { timestamp: Date.now(), data: result });
       return result;
     }
     // If code is not 0, throw to trigger fallback
@@ -49,6 +52,36 @@ async function fetchTikTokData(videoUrl) {
   } catch (error) {
     console.log(`[Primary API Failed] ${error.message}.`);
     throw new Error("Gagal mengambil data video. Server sedang sibuk, coba lagi nanti.");
+  }
+}
+
+/**
+ * Resolves short links (vt.tiktok.com, vm.tiktok.com) to full canonical URLs.
+ * This is crucial for TikTok Lite links to work with the API.
+ */
+async function expandUrl(url) {
+  // Only attempt to expand common short domains
+  if (!url.includes("vt.tiktok.com") && !url.includes("vm.tiktok.com") && !url.includes("/t/")) {
+    return url;
+  }
+
+  try {
+    console.log(`[URL Expand] Resolving: ${url}`);
+    const response = await axios.head(url, {
+      maxRedirects: 10,
+      headers: {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.0.0 Safari/537.36",
+      },
+      validateStatus: (status) => status >= 200 && status < 400
+    });
+    
+    // In Node.js Axios, the final URL after redirects is in request.res.responseUrl
+    const expanded = response.request.res.responseUrl || url;
+    console.log(`[URL Expand] Resolved to: ${expanded}`);
+    return expanded;
+  } catch (error) {
+    console.warn(`[URL Expand Warning] Failed to expand ${url}: ${error.message}`);
+    return url; // Fallback to original if expansion fails (e.g. 403)
   }
 }
 

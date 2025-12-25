@@ -9,9 +9,11 @@ async function handleTikTokDownload(req, res) {
       return res.status(400).json({ status: "error", message: "Link TikTok wajib diisi." });
     }
     
-    // Validate URL format (Must contain tiktok.com and be a valid URL string)
-    if (typeof url !== 'string' || !url.includes('tiktok.com') || url.length > 500) {
-      return res.status(400).json({ status: "error", message: "Link tidak valid. Masukkan link TikTok yang benar." });
+    // Validate URL format (Must contain tiktok.com or douyin.com)
+    const isValidUrl = (url.includes('tiktok.com') || url.includes('douyin.com')) && typeof url === 'string';
+    
+    if (!isValidUrl || url.length > 500) {
+      return res.status(400).json({ status: "error", message: "Link tidak valid. Masukkan link TikTok/TikTok Lite yang benar." });
     }
 
     const data = await fetchTikTokData(url);
