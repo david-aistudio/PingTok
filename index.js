@@ -13,8 +13,14 @@ app.use(express.json());
 app.set("json spaces", 2);
 
 // API Routes
-app.use("/api/tiktok", require("./routes/tiktok"));
+app.use("/api/universal", require("./routes/universal"));
 app.use("/api/proxy", require("./routes/proxy"));
+
+// Legacy redirect for backward compatibility
+app.get("/api/tiktok/download", (req, res) => {
+  const { url } = req.query;
+  res.redirect(`/api/universal/resolve?url=${encodeURIComponent(url)}`);
+});
 
 // Serve Frontend (Monolith Mode)
 app.use(express.static(path.join(__dirname, "public")));
