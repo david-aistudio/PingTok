@@ -241,6 +241,9 @@
 
     <!-- HUD Top Right -->
     <div class="absolute top-6 right-6 flex gap-4 z-50">
+        <a href="/docs" class="text-xs text-blue-600 font-bold border border-blue-600 px-3 py-1 bg-white hover:bg-blue-600 hover:text-white transition-colors cursor-pointer shadow-lg no-underline flex items-center">
+            [ API_DOCS ]
+        </a>
         <button onclick="toggleLanguage()" id="langBtn" class="text-xs text-black font-bold border border-black px-3 py-1 bg-white hover:bg-black hover:text-white transition-colors cursor-pointer shadow-lg">
             [ LANG: EN ]
         </button>
@@ -410,10 +413,7 @@
                             <img id="authorAvatar" src="" class="w-12 h-12 rounded-full border-2 border-gray-200">
                             <div>
                                 <h3 id="authorName" class="text-black font-bold text-xl leading-none"></h3>
-                                <div class="flex items-center gap-2 mt-1">
-                                    <p id="authorId" class="text-xs text-gray-500 font-mono font-bold bg-gray-100 inline-block px-1">@HANDLE</p>
-                                    <span id="platformBadge" class="text-[9px] font-bold bg-blue-600 text-white px-2 py-0.5 uppercase tracking-tighter">TIKTOK</span>
-                                </div>
+                                <p id="authorId" class="text-xs text-gray-500 font-mono mt-1 font-bold bg-gray-100 inline-block px-1">@HANDLE</p>
                             </div>
                         </div>
                         
@@ -709,17 +709,6 @@
             document.getElementById('authorName').textContent = data.author.name;
             document.getElementById('authorId').textContent = '@' + data.author.id;
             document.getElementById('videoTitle').textContent = data.title;
-
-            // Set Platform Badge
-            const badge = document.getElementById('platformBadge');
-            badge.textContent = data.platform;
-            const colors = {
-                tiktok: 'bg-black',
-                instagram: 'bg-gradient-to-tr from-yellow-400 via-red-500 to-purple-500',
-                youtube: 'bg-red-600',
-                facebook: 'bg-blue-700'
-            };
-            badge.className = `text-[9px] font-bold text-white px-2 py-0.5 uppercase tracking-tighter ${colors[data.platform] || 'bg-gray-600'}`;
             
             // Format Numbers
             document.getElementById('statPlays').textContent = formatMetric(data.stats.plays);

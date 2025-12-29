@@ -25,6 +25,11 @@ app.get("/api/tiktok/download", (req, res) => {
 // Serve Frontend (Monolith Mode)
 app.use(express.static(path.join(__dirname, "public")));
 
+// Documentation Route
+app.get("/docs", (req, res) => {
+  res.sendFile(path.join(__dirname, "public", "docs.html"));
+});
+
 app.get("*", (req, res) => {
   res.sendFile(path.join(__dirname, "public", "index.html"));
 });
