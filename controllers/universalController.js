@@ -5,10 +5,9 @@ async function handleUniversalDownload(req, res) {
     const { url } = req.query;
 
     if (!url) {
-      return res.status(400).json({ 
-        status: "error", 
-        message: "URL is required." 
-      });
+      // If accessed directly without URL, show documentation instead of JSON error
+      // This is friendlier for developers exploring the API
+      return res.redirect('/docs');
     }
 
     // Call the universal service

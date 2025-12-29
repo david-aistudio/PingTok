@@ -17,91 +17,138 @@
             font-family: 'JetBrains Mono', monospace;
             background-color: #FAFAFA;
             color: #0f0f0f;
+            -webkit-font-smoothing: antialiased;
         }
         .method-badge {
             background-color: var(--tech-blue);
             color: white;
-            padding: 2px 8px;
+            padding: 4px 10px;
             font-weight: bold;
-            font-size: 0.75rem;
+            font-size: 0.7rem;
+            border-radius: 4px;
+        }
+        /* Mobile friendly code blocks */
+        pre {
+            overflow-x: auto;
+            border-radius: 8px;
+            background: #282c34; /* Match atom-one-dark */
+        }
+        pre code {
+            font-size: 0.8rem;
+            line-height: 1.5;
+            white-space: pre; /* Keep formatting */
+        }
+        
+        /* Custom scrollbar for horizontal scrolling elements */
+        .overflow-x-auto::-webkit-scrollbar {
+            height: 6px;
+        }
+        .overflow-x-auto::-webkit-scrollbar-track {
+            background: #f1f1f1; 
+        }
+        .overflow-x-auto::-webkit-scrollbar-thumb {
+            background: #ccc; 
+            border-radius: 3px;
         }
     </style>
 </head>
 <body class="min-h-screen flex flex-col">
 
     <!-- Navbar -->
-    <nav class="border-b border-black bg-white p-6 sticky top-0 z-50">
-        <div class="max-w-5xl mx-auto flex justify-between items-center">
-            <h1 class="text-2xl font-bold tracking-tighter">PINGTOK<span class="text-blue-600">_API</span></h1>
-            <div class="flex gap-6 text-sm font-bold">
-                <a href="/" class="hover:text-blue-600">DEMO APP</a>
-                <a href="#" class="text-blue-600 underline">DOCUMENTATION</a>
-                <a href="https://github.com/david-aistudio" target="_blank" class="hover:text-blue-600">GITHUB</a>
+    <nav class="border-b border-gray-200 bg-white sticky top-0 z-50 shadow-sm">
+        <div class="max-w-5xl mx-auto flex justify-between items-center p-4 md:p-6">
+            <h1 class="text-xl md:text-2xl font-bold tracking-tighter">PINGTOK<span class="text-blue-600">_API</span></h1>
+            <div class="flex gap-4 md:gap-6 text-xs md:text-sm font-bold items-center">
+                <a href="/" class="hover:text-blue-600 transition-colors">DEMO</a>
+                <a href="https://github.com/david-aistudio" target="_blank" class="hover:text-blue-600 transition-colors hidden md:block">GITHUB</a>
+                <a href="/docs" class="text-blue-600 bg-blue-50 px-3 py-1 rounded-full border border-blue-100">v1.0</a>
             </div>
         </div>
     </nav>
 
-    <main class="flex-grow max-w-5xl mx-auto w-full p-6 py-12">
+    <main class="flex-grow w-full max-w-5xl mx-auto px-4 md:px-6 py-8 md:py-12">
         
         <!-- Hero -->
-        <div class="mb-16">
-            <h2 class="text-4xl font-bold mb-4">The Universal TikTok Engine.</h2>
-            <p class="text-gray-600 max-w-2xl text-sm leading-relaxed">
-                PingTok API provides a high-velocity, programmatic interface to extract metadata and download links from TikTok videos and slideshows. Built for developers who need stability and speed.
+        <div class="mb-12 md:mb-16">
+            <span class="text-[10px] font-bold tracking-widest text-blue-600 uppercase mb-2 block">Developer Reference</span>
+            <h2 class="text-3xl md:text-5xl font-bold mb-4 tracking-tight">The Universal TikTok Engine.</h2>
+            <p class="text-gray-600 text-sm md:text-base leading-relaxed max-w-2xl">
+                PingTok API provides a high-velocity, programmatic interface to extract metadata and download links from TikTok videos and slideshows. <br class="hidden md:block">Built for developers who need stability and speed.
             </p>
         </div>
 
         <!-- Endpoints Section -->
-        <section class="mb-16">
-            <h3 class="text-xl font-bold border-b border-black pb-2 mb-6 uppercase">Endpoints</h3>
+        <section class="mb-12 md:mb-16">
+            <h3 class="text-sm font-bold border-b border-gray-200 pb-2 mb-6 uppercase text-gray-400 tracking-wider">Endpoints</h3>
             
-            <div class="bg-white border border-gray-300 p-6 shadow-sm hover:shadow-md transition-shadow">
-                <div class="flex items-center gap-4 mb-4">
-                    <span class="method-badge">GET</span>
-                    <code class="text-lg font-bold bg-gray-100 px-2 py-1">/api/universal/resolve</code>
-                </div>
+            <div class="bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-300">
                 
-                <p class="text-sm text-gray-600 mb-6">
-                    Resolves a TikTok URL (Short or Canonical) into direct download links and metadata.
-                </p>
+                <div class="p-4 md:p-6 border-b border-gray-100 bg-gray-50">
+                    <div class="flex flex-col md:flex-row md:items-center gap-3 mb-2">
+                        <div class="flex items-center gap-2">
+                            <span class="method-badge">GET</span>
+                            <span class="text-xs font-bold text-gray-400">REST API</span>
+                        </div>
+                        <code class="text-sm md:text-base font-bold text-gray-800 break-all">/api/universal/resolve</code>
+                    </div>
+                    <p class="text-xs md:text-sm text-gray-500 mt-2">
+                        Resolves a TikTok URL (Short or Canonical) into direct download links and metadata.
+                    </p>
+                </div>
 
-                <!-- Parameters -->
-                <h4 class="text-xs font-bold uppercase text-gray-500 mb-3">Query Parameters</h4>
-                <table class="w-full text-left text-sm mb-8 border border-gray-200">
-                    <thead class="bg-gray-50 border-b border-gray-200">
-                        <tr>
-                            <th class="p-3 border-r">Field</th>
-                            <th class="p-3 border-r">Type</th>
-                            <th class="p-3">Description</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td class="p-3 border-r font-bold">url</td>
-                            <td class="p-3 border-r text-blue-600">string</td>
-                            <td class="p-3 text-gray-600">The TikTok video URL (e.g., https://vt.tiktok.com/...)</td>
-                        </tr>
-                    </tbody>
-                </table>
+                <div class="p-4 md:p-6">
+                    <!-- Parameters -->
+                    <h4 class="text-[10px] font-bold uppercase text-gray-400 mb-3 tracking-wider">Query Parameters</h4>
+                    <div class="overflow-x-auto mb-8 border border-gray-100 rounded-lg">
+                        <table class="w-full text-left text-xs md:text-sm min-w-[500px]">
+                            <thead class="bg-gray-50 text-gray-500">
+                                <tr>
+                                    <th class="p-3 border-b font-semibold">Field</th>
+                                    <th class="p-3 border-b font-semibold">Type</th>
+                                    <th class="p-3 border-b font-semibold">Required</th>
+                                    <th class="p-3 border-b font-semibold">Description</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-100">
+                                <tr>
+                                    <td class="p-3 font-mono font-bold text-gray-800">url</td>
+                                    <td class="p-3 text-blue-600 font-mono">string</td>
+                                    <td class="p-3 text-red-500 font-bold">Yes</td>
+                                    <td class="p-3 text-gray-600">The TikTok video URL (e.g. vt.tiktok.com/...)</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
 
-                <!-- Code Example -->
-                <h4 class="text-xs font-bold uppercase text-gray-500 mb-3">Example Request</h4>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <pre><code class="language-bash rounded border border-gray-200">curl -X GET \
+                    <!-- Code Example -->
+                    <h4 class="text-[10px] font-bold uppercase text-gray-400 mb-3 tracking-wider">Example Request</h4>
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <div>
+                            <span class="text-xs font-bold text-gray-500 mb-2 block">cURL</span>
+                            <pre><code class="language-bash">curl -X GET \
   'https://pingtok.vercel.app/api/universal/resolve?url=https://vt.tiktok.com/ZSj...'</code></pre>
-                    
-                    <pre><code class="language-javascript rounded border border-gray-200">const res = await fetch(
-  '/api/universal/resolve?url=...' 
+                        </div>
+                        
+                        <div>
+                            <span class="text-xs font-bold text-gray-500 mb-2 block">Node.js</span>
+                            <pre><code class="language-javascript">const res = await fetch(
+  '/api/universal/resolve?url=...'
 );
-const data = await res.json();</code></pre>
+const data = await res.json();
+console.log(data);</code></pre>
+                        </div>
+                    </div>
                 </div>
             </div>
         </section>
 
         <!-- Response Schema -->
         <section>
-            <h3 class="text-xl font-bold border-b border-black pb-2 mb-6 uppercase">Response Schema</h3>
-            <pre><code class="language-json rounded border border-gray-200 p-4 text-sm">{
+            <h3 class="text-sm font-bold border-b border-gray-200 pb-2 mb-6 uppercase text-gray-400 tracking-wider">Response Model</h3>
+            <div class="relative group">
+                <div class="absolute -inset-1 bg-gradient-to-r from-blue-100 to-gray-100 rounded-lg blur opacity-25 group-hover:opacity-50 transition duration-200"></div>
+                <div class="relative">
+                    <pre><code class="language-json rounded-lg border border-gray-200 p-4 text-xs md:text-sm shadow-sm">{
   "status": "success",
   "platform": "tiktok",
   "type": "video", // or "slideshow"
@@ -133,12 +180,19 @@ const data = await res.json();</code></pre>
     }
   ]
 }</code></pre>
+                </div>
+            </div>
         </section>
 
     </main>
 
-    <footer class="border-t border-gray-200 p-6 text-center text-xs font-bold text-gray-400 uppercase tracking-widest">
-        &copy; 2025 PingTok API. All Systems Operational.
+    <footer class="border-t border-gray-200 bg-white p-8 text-center mt-12">
+        <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2">
+            &copy; 2025 PingTok API. All Systems Operational.
+        </p>
+        <p class="text-[10px] text-gray-300">
+            Node: sg-sin-1 // Latency: 45ms
+        </p>
     </footer>
 
 </body>
